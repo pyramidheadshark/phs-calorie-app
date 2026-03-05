@@ -84,16 +84,13 @@ class TelegramBot:
         protein_g: float,
         fat_g: float,
         carbs_g: float,
-        water_ml: int,
-        water_target_ml: int,
     ) -> bool:
         text = (
             f"📊 <b>Итоги дня</b>\n\n"
             f"🔥 Калории: <b>{calories}</b> из {target} ккал\n"
             f"💪 Белки: <b>{protein_g:.0f} г</b>\n"
             f"🥑 Жиры: <b>{fat_g:.0f} г</b>\n"
-            f"🌾 Углеводы: <b>{carbs_g:.0f} г</b>\n"
-            f"💧 Вода: <b>{water_ml} мл</b> из {water_target_ml} мл"
+            f"🌾 Углеводы: <b>{carbs_g:.0f} г</b>"
         )
         return await self.send_reminder(chat_id, text)
 

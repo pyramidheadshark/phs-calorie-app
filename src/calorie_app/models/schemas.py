@@ -40,22 +40,20 @@ class MealResponse(BaseModel):
     confirmed: bool
 
 
-class WaterLogRequest(BaseModel):
-    amount_ml: int = Field(ge=50, le=2000)
+class MealUpdateRequest(BaseModel):
+    description: str | None = None
+    nutrition: NutritionFactsSchema | None = None
+    confidence: Literal["high", "medium", "low"] | None = None
 
 
-class WaterEntryResponse(BaseModel):
-    id: uuid.UUID
-    amount_ml: int
-    logged_at: datetime
+class MealTextRequest(BaseModel):
+    description: str
 
 
 class DailyLogResponse(BaseModel):
     date: str
     meals: list[MealResponse]
-    water_entries: list[WaterEntryResponse]
     total_nutrition: NutritionFactsSchema
-    total_water_ml: int
 
 
 class WeeklyDaySummary(BaseModel):
@@ -74,9 +72,18 @@ class StreakResponse(BaseModel):
     streak_days: int
 
 
+class HistoryDaySchema(BaseModel):
+    date: str
+    meal_count: int
+    calories: int
+
+
+class HistoryResponse(BaseModel):
+    days: list[HistoryDaySchema]
+
+
 class UserSettingsSchema(BaseModel):
     calorie_target: int = 2000
-    water_target_ml: int = 2000
     protein_target_g: int = 120
     fat_target_g: int = 70
     carbs_target_g: int = 250
@@ -85,7 +92,6 @@ class UserSettingsSchema(BaseModel):
     dinner_time: str = "19:00"
     timezone: str = "Europe/Moscow"
     meal_reminders_enabled: bool = True
-    water_reminders_enabled: bool = True
     summary_enabled: bool = True
     profile_text: str = ""
     goal_description: str = ""
@@ -103,7 +109,6 @@ class ProfileParseResponse(BaseModel):
     protein_target_g: int
     fat_target_g: int
     carbs_target_g: int
-    water_target_ml: int
     goal_description: str
     kitchen_equipment: list[str]
     food_preferences: str
@@ -138,23 +143,3 @@ class RecipeResponse(BaseModel):
 
 class RecipeFeedbackRequest(BaseModel):
     liked: bool
-
-
-class MealUpdateRequest(BaseModel):
-    description: str | None = None
-    nutrition: NutritionFactsSchema | None = None
-    confidence: Literal["high", "medium", "low"] | None = None
-
-
-class MealTextRequest(BaseModel):
-    description: str
-
-
-class HistoryDaySchema(BaseModel):
-    date: str
-    meal_count: int
-    calories: int
-
-
-class HistoryResponse(BaseModel):
-    days: list[HistoryDaySchema]

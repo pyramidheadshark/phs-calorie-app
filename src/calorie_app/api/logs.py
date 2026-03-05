@@ -5,7 +5,7 @@ from datetime import date
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from calorie_app.adapters.db.repos import MealRepo, WaterRepo
+from calorie_app.adapters.db.repos import MealRepo
 from calorie_app.adapters.db.session import get_session
 from calorie_app.api.deps import get_current_user
 from calorie_app.core.domain import DailyLog, User
@@ -17,7 +17,6 @@ from calorie_app.models.schemas import (
     MealResponse,
     NutritionFactsSchema,
     StreakResponse,
-    WaterEntryResponse,
     WeeklyDaySummary,
     WeeklyStatsResponse,
 )
@@ -32,16 +31,12 @@ async def get_daily_log(
     session: AsyncSession = Depends(get_session),
 ) -> DailyLogResponse:
     meal_repo = MealRepo(session)
-    water_repo = WaterRepo(session)
-
     meals = await meal_repo.get_by_date(current_user.telegram_id, log_date)
-    water_entries = await water_repo.get_by_date(current_user.telegram_id, log_date)
 
     log = DailyLog(
         user_id=current_user.telegram_id,
         date=str(log_date),
         meals=meals,
-        water_entries=water_entries,
     )
     total = log.total_nutrition
 
@@ -65,10 +60,6 @@ async def get_daily_log(
             )
             for m in meals
         ],
-        water_entries=[
-            WaterEntryResponse(id=w.id, amount_ml=w.amount_ml, logged_at=w.logged_at)
-            for w in water_entries
-        ],
         total_nutrition=NutritionFactsSchema(
             calories=total.calories,
             protein_g=total.protein_g,
@@ -76,7 +67,6 @@ async def get_daily_log(
             carbs_g=total.carbs_g,
             portion_g=total.portion_g,
         ),
-        total_water_ml=log.total_water_ml,
     )
 
 

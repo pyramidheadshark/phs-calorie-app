@@ -28,18 +28,6 @@ def calorie_progress(log: DailyLog, settings: UserSettings) -> dict[str, int | f
     }
 
 
-def water_progress(log: DailyLog, settings: UserSettings) -> dict[str, int | float]:
-    consumed = log.total_water_ml
-    target = settings.water_target_ml
-    return {
-        "consumed_ml": consumed,
-        "target_ml": target,
-        "remaining_ml": max(0, target - consumed),
-        "percent": round(consumed / target * 100, 1) if target > 0 else 0.0,
-        "goal_reached": consumed >= target,
-    }
-
-
 def compute_streak(logged_dates: list[str]) -> int:
     from datetime import date, timedelta
 

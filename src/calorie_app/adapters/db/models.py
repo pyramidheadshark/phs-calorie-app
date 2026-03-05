@@ -49,19 +49,6 @@ class MealEntryModel(Base):
     )
 
 
-class WaterEntryModel(Base):
-    __tablename__ = "water_entries"
-
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
-    user_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("users.telegram_id", ondelete="CASCADE"), nullable=False
-    )
-    logged_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
-    amount_ml: Mapped[int] = mapped_column(Integer, nullable=False)
-
-
 class RecipeModel(Base):
     __tablename__ = "recipe_entries"
 

@@ -12,7 +12,7 @@ def fake_user() -> User:
         telegram_id=123456789,
         username="testuser",
         first_name="Test",
-        settings=UserSettings(calorie_target=2000, water_target_ml=2000),
+        settings=UserSettings(calorie_target=2000),
     )
 
 

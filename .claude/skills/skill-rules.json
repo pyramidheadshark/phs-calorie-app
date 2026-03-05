@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "description": "Skill auto-activation rules for ml-claude-infra",
+  "rules": [
+    {
+      "skill": "python-project-standards",
+      "triggers": {
+        "files": [
+          "pyproject.toml",
+          "*.py",
+          ".pre-commit-config.yaml",
+          "uv.lock"
+        ],
+        "keywords": [
+          "lint",
+          "ruff",
+          "mypy",
+          "type hint",
+          "pre-commit",
+          "uv",
+          "dependency",
+          "import"
+        ],
+        "always_load": true
+      },
+      "priority": 1
+    },
+    {
+      "skill": "test-first-patterns",
+      "triggers": {
+        "files": [
+          "tests/**/*.py",
+          "conftest.py",
+          "*.feature",
+          "pytest.ini"
+        ],
+        "keywords": [
+          "test",
+          "pytest",
+          "bdd",
+          "gherkin",
+          "fixture",
+          "mock",
+          "assert",
+          "coverage",
+          "tdd"
+        ],
+        "always_load": false
+      },
+      "priority": 2
+    }
+  ],
+  "context_management": {
+    "max_skills_per_session": 3,
+    "compression_threshold_lines": 300,
+    "status_file": "dev/status.md",
+    "always_load_status": true
+  }
+}

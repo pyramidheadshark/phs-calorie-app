@@ -11,6 +11,7 @@ from calorie_app.adapters.db.session import get_session
 from calorie_app.adapters.gemini import gemini_adapter
 from calorie_app.adapters.storage import photo_storage
 from calorie_app.api.deps import get_current_user
+from calorie_app.api.ratelimit import check_ai_rate_limit
 from calorie_app.core.domain import MealEntry, NutritionFacts, User
 from calorie_app.models.schemas import (
     MealAnalysisResponse,
@@ -32,7 +33,7 @@ MAX_FILE_BYTES = 10 * 1024 * 1024
 async def analyze_photo_save_path(
     file: UploadFile = File(...),
     context: str = Form(""),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_ai_rate_limit),
 ) -> dict:  # type: ignore[type-arg]
     if file.content_type not in ALLOWED_IMAGE_TYPES:
         raise HTTPException(status_code=415, detail="Unsupported image type")
@@ -65,7 +66,7 @@ async def analyze_photo_save_path(
 @router.post("/text", response_model=MealAnalysisResponse)
 async def analyze_text(
     body: MealTextRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_ai_rate_limit),
 ) -> MealAnalysisResponse:
     analysis = await gemini_adapter.analyze_text(body.description)
     return MealAnalysisResponse(
@@ -85,7 +86,7 @@ async def analyze_text(
 @router.post("/voice", response_model=MealAnalysisResponse)
 async def analyze_voice(
     file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_ai_rate_limit),
 ) -> MealAnalysisResponse:
     if file.content_type not in ALLOWED_AUDIO_TYPES:
         raise HTTPException(status_code=415, detail="Unsupported audio type")

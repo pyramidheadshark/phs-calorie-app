@@ -41,14 +41,12 @@ class MacroTargets:
 @dataclass
 class ReminderSettings:
     meal_enabled: bool = True
-    water_enabled: bool = True
     summary_enabled: bool = True
 
 
 @dataclass
 class UserSettings:
     calorie_target: int = 2000
-    water_target_ml: int = 2000
     macro_targets: MacroTargets = field(default_factory=MacroTargets)
     meal_times: MealReminderTimes = field(default_factory=MealReminderTimes)
     timezone: str = "Europe/Moscow"
@@ -96,14 +94,6 @@ class MealEntry:
 
 
 @dataclass
-class WaterEntry:
-    user_id: int
-    amount_ml: int
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
-    logged_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-
-
-@dataclass
 class RecipeEntry:
     user_id: int
     title: str
@@ -123,7 +113,6 @@ class DailyLog:
     user_id: int
     date: str
     meals: list[MealEntry] = field(default_factory=list)
-    water_entries: list[WaterEntry] = field(default_factory=list)
 
     @property
     def total_nutrition(self) -> NutritionFacts:
@@ -131,7 +120,3 @@ class DailyLog:
         for meal in self.meals:
             result = result + meal.nutrition
         return result
-
-    @property
-    def total_water_ml(self) -> int:
-        return sum(w.amount_ml for w in self.water_entries)

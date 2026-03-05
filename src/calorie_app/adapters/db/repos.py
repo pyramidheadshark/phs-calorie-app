@@ -7,14 +7,13 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from calorie_app.adapters.db.models import MealEntryModel, RecipeModel, UserModel, WaterEntryModel
+from calorie_app.adapters.db.models import MealEntryModel, RecipeModel, UserModel
 from calorie_app.core.domain import (
     MealEntry,
     NutritionFacts,
     RecipeEntry,
     User,
     UserSettings,
-    WaterEntry,
 )
 
 
@@ -27,7 +26,6 @@ def _user_from_model(m: UserModel) -> User:
     rem_raw = raw.get("reminders", {})
     settings = UserSettings(
         calorie_target=raw.get("calorie_target", 2000),
-        water_target_ml=raw.get("water_target_ml", 2000),
         macro_targets=MacroTargets(
             protein_g=macro_raw.get("protein_g", 120),
             fat_g=macro_raw.get("fat_g", 70),
@@ -41,7 +39,6 @@ def _user_from_model(m: UserModel) -> User:
         timezone=raw.get("timezone", "Europe/Moscow"),
         reminders=ReminderSettings(
             meal_enabled=rem_raw.get("meal_enabled", True),
-            water_enabled=rem_raw.get("water_enabled", True),
             summary_enabled=rem_raw.get("summary_enabled", True),
         ),
         profile_text=raw.get("profile_text", ""),
@@ -77,15 +74,6 @@ def _meal_from_model(m: MealEntryModel) -> MealEntry:
         confirmed=m.confirmed,
         logged_at=m.logged_at,
         created_at=m.created_at,
-    )
-
-
-def _water_from_model(m: WaterEntryModel) -> WaterEntry:
-    return WaterEntry(
-        id=m.id,
-        user_id=m.user_id,
-        amount_ml=m.amount_ml,
-        logged_at=m.logged_at,
     )
 
 
@@ -268,37 +256,6 @@ class MealRepo:
             }
             for row in result.all()
         ]
-
-
-class WaterRepo:
-    def __init__(self, session: AsyncSession) -> None:
-        self._session = session
-
-    async def save(self, entry: WaterEntry) -> WaterEntry:
-        model = WaterEntryModel(
-            id=entry.id,
-            user_id=entry.user_id,
-            logged_at=entry.logged_at,
-            amount_ml=entry.amount_ml,
-        )
-        self._session.add(model)
-        await self._session.commit()
-        await self._session.refresh(model)
-        return _water_from_model(model)
-
-    async def get_by_date(self, user_id: int, log_date: date) -> list[WaterEntry]:
-        start = datetime(log_date.year, log_date.month, log_date.day, 0, 0, 0, tzinfo=timezone.utc)
-        end = datetime(log_date.year, log_date.month, log_date.day, 23, 59, 59, tzinfo=timezone.utc)
-        result = await self._session.execute(
-            select(WaterEntryModel)
-            .where(
-                WaterEntryModel.user_id == user_id,
-                WaterEntryModel.logged_at >= start,
-                WaterEntryModel.logged_at <= end,
-            )
-            .order_by(WaterEntryModel.logged_at)
-        )
-        return [_water_from_model(m) for m in result.scalars().all()]
 
 
 def _recipe_from_model(m: RecipeModel) -> RecipeEntry:

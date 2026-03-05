@@ -1,6 +1,59 @@
 services:
-  bot:
+  api:
     build: .
-    container_name: phs_calorie_bot
+    container_name: phs_calorie_api
     restart: unless-stopped
     env_file: .env
+    ports:
+      - "8001:8000"
+    volumes:
+      - photo_storage:/app/photos
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: phs_calorie_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: calorie
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: calorie_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: phs_calorie_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: .
+    container_name: phs_calorie_worker
+    restart: unless-stopped
+    env_file: .env
+    command: ["celery", "-A", "calorie_app.worker.celery_app", "worker", "--loglevel=info"]
+    depends_on:
+      - redis
+      - postgres
+
+  beat:
+    build: .
+    container_name: phs_calorie_beat
+    restart: unless-stopped
+    env_file: .env
+    command: ["celery", "-A", "calorie_app.worker.celery_app", "beat", "--loglevel=info"]
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+  redis_data:
+  photo_storage:
