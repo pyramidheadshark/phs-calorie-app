@@ -5,7 +5,7 @@ Telegram Mini App for meal logging — photograph or describe food, get calories
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue?style=flat-square)
 ![FastAPI](https://img.shields.io/badge/fastapi-0.115%2B-009688?style=flat-square)
 ![React](https://img.shields.io/badge/react-18-61dafb?style=flat-square)
-[![CI](https://github.com/pyramidheadshark/phs-calorie-app/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/pyramidheadshark/phs-calorie-app/actions/workflows/ci.yml)
+[![CI](https://github.com/pyramidheadshark/phs_calorie_app/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/pyramidheadshark/phs_calorie_app/actions/workflows/ci.yml)
 
 ---
 
